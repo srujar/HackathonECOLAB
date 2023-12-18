@@ -1,0 +1,185 @@
+<form role="form" class="form" [formGroup]="questionForm" novalidate>
+    <div class="mainform">
+        <div class="accordion" id="accordionExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button form-label mb-0" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Checklist Details
+                    </button>
+
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <div class="mb-3">
+                            <label for="" class="form-label">Brand</label>
+                            <ng-select [items]="brand" bindLabel="Brand" bindValue="CorporateAccountId"
+                                (change)="onBrandChange($event)" placeholder="Please select the brand">
+                            </ng-select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Display Name</label>
+                            <input type="text" formControlName="listNameTextId" class="form-control"
+                                placeholder="Please enter the display name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Cheklist Type</label>
+                            <ng-select [readonly]="checklistType.length == 0" [items]="checklistType"
+                                bindLabel="CodeValue" bindValue="CodeId" (change)="onCheklistTypeChange($event)"
+                                placeholder="Please select the cheklist type" formControlName="listTypeId">
+                            </ng-select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Role</label>
+                            <ng-select [readonly]="role.length == 0" [items]="role" bindLabel="CodeValue"
+                                bindValue="CodeId" placeholder="Please select the role" formControlName="listRoleId">
+                            </ng-select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Area (Multiselect)</label>
+                            <ng-select [readonly]="areas.length == 0" [items]="areas" [multiple]="true" formControlName="areaIds"
+                                bindLabel="CodeValue" bindValue="CodeId" placeholder="Please select the area">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed form-label mb-0" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        Questions
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <div class="">
+                            <div class="mb-3">
+                                <label for="" class="form-label">Questions (Multiselect)</label>
+                                <ng-select [readonly]="checksddl.length == 0" [multiple]="true" [items]="checksddl"
+                                    bindLabel="CheckName" bindValue="QuestionKey" formControlName="QuestionKey"
+                                    placeholder="Please Select the list of questions">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed form-label mb-0" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        Scheduling
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <div class="">
+                            <div class="mb-2">
+                                <label for="" class="form-label">Schedule Type</label>
+                            </div>
+
+                            <div class="col">
+                                <label class="col margin-right" *ngFor="let radiobutton of typeOfSchudule">
+                                    <span class="d-flex align-center">
+                                        <input type="radio" formControlName="scheduleRecurrenceTypeId" (change)="changeSchuduleType(model.option)"
+                                            (click)="model.option = radiobutton"
+                                            [checked]="radiobutton === model.option"><span
+                                            class="mx-2">{{radiobutton}}</span>
+                                    </span>
+                                </label>
+                                <div class="col">
+                                    <div *ngIf="hourly" class="mb-2">
+                                        <div class="d-flex">
+                                            <div class="">
+                                                <span class="fontandweight">Every</span>
+                                                <input type="text" class="form-control">
+                                                <span class="fontandweight">day(s)</span>
+                                            </div>
+                                            <div class="ml-2 ps-4">
+                                                <span class="fontandweight">Every</span>
+                                                <input type="text" class="form-control">
+                                                <span class="fontandweight">hour(s)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="daily" class="mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <div class="">
+                                                <span class="fontandweight">Every</span>
+                                                <input type="text" class="form-control">
+                                                <span class="fontandweight">day(s)</span>
+                                            </div>
+                                            <div class="">
+                                                <div class="form-check d-flex align-center ms-1">
+                                                    <input class="form-check-input" type="checkbox" value=""
+                                                        id="flexCheckDefault">
+                                                    <label class="form-check-label ps-1" for="flexCheckDefault">
+                                                        Only Weekdays
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <label class="fontandweight">First Start Time</label>
+                                        <ngb-timepicker formControlName="firstStartTime" class="datetimepiker" [meridian]="meridian" />
+                                    </div>
+                                    <div *ngIf="hourly">
+                                        <label formControlName="lastStartTime" class="fontandweight">Last Start Time</label>
+                                        <ngb-timepicker class="datetimepiker" [meridian]="meridian" />
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="fontandweight">Active Duration</label>
+                                        <input formControlName="timeDuration" type="text" class="form-control inputwidth"
+                                            placeholder="Active Duration">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="fontandweight">Start date</label>
+                                        <div class="input-group inputwidth">
+                                            <input formControlName="startDate" class="form-control" placeholder="yyyy-mm-dd" ngbDatepicker
+                                                #startDate="ngbDatepicker" />
+                                            <button class="btn btn-outline-secondary bi bi-calendar3"
+                                                (click)="startDate.toggle()" type="button"></button>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2" *ngIf="!noRecurrence">
+                                        <label class="fontandweight">EndDate date</label>
+                                        <div class="input-group inputwidth">
+                                            <input formControlName="endDate" class="form-control" placeholder="yyyy-mm-dd" ngbDatepicker
+                                                #endDate="ngbDatepicker" />
+                                            <button class="btn btn-outline-secondary bi bi-calendar3"
+                                                (click)="endDate.toggle()" type="button"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed form-label mb-0" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        Locations
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <div class="">
+                            <div class="mb-3">
+                                <div>Locations goes here</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="float-end mt-2 w-100">
+        <button type="button" class="btn btn-primary ecolab-col text-right mb-3 mt-2 w-100">Submit</button>
+    </div>
+</form>
