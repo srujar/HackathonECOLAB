@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { AppService } from './app.service';
 import { HelperService } from './helper.service';
 import { forkJoin } from 'rxjs';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -13,9 +14,18 @@ export class AppComponent {
   constructor(
     private fb: FormBuilder,
     private appService: AppService,
-    private helperService: HelperService
+    private helperService: HelperService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
   ) {
     this.typeOfSchudule = ['No Recurrence', 'Hourly', 'Daily'];
+
+    activatedRoute.queryParamMap.subscribe(async (params:any) => {
+      if(params.params.hasOwnProperty('token')){
+        this.helperService.setHeaderData(params.params);
+        await this.getInitalData();
+      }
+    })
   }
 
   title = 'createChecklistFormMobile';
@@ -42,12 +52,11 @@ export class AppComponent {
 
   questionForm!: FormGroup;
 
-  ngOnInit(): void {
-    this.getInitalData();
+  async ngOnInit() {
     this.initializeForm();
     this.helperService.getDropDownData.subscribe((data: any) => {
       if (data) {
-        console.log(this.helperService.dropDownData);
+        console.log(data);
         this.brand = this.helperService.dropDownData.brands;
         this.checklistType = this.helperService.dropDownData.checklistTypes;
         this.role = this.helperService.dropDownData.checklistUserRoles;
@@ -63,6 +72,7 @@ export class AppComponent {
   }
 
   onBrandChange(brand: any) {
+    console.log(brand);
     this.selectedBrand = brand;
     this.getDropDownData();
   }
@@ -100,6 +110,7 @@ export class AppComponent {
   initializeForm() {
     this.changeSchuduleType(this.model);
     this.questionForm = this.fb.group({
+      CorporateAccountId:[{ value: null, disabled: false }, []],
       listNameTextId: [{ value: null, disabled: false }, []],
       listTypeId: [{ value: null, disabled: false }, []],
       listRoleId: [{ value: null, disabled: false }, []],
@@ -115,7 +126,7 @@ export class AppComponent {
   }
 
   changeSchuduleType(getSchuduleType: any) {
-    console.log(getSchuduleType)
+    // console.log(getSchuduleType)
     if (getSchuduleType === 'No Recurrence') {
       this.noRecurrence = true;
       this.hourly = false;
@@ -129,5 +140,10 @@ export class AppComponent {
       this.hourly = false;
       this.noRecurrence = false;
     }
+  }
+
+  submit(){
+    console.log(this.questionForm.value);
+    let reqData = this.helperService.createJSON(this.questionForm.value);
   }
 }

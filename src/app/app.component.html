@@ -14,7 +14,8 @@
                         <div class="mb-3">
                             <label for="" class="form-label">Brand</label>
                             <ng-select [items]="brand" bindLabel="Brand" bindValue="CorporateAccountId"
-                                (change)="onBrandChange($event)" placeholder="Please select the brand">
+                                (change)="onBrandChange($event)" placeholder="Please select the brand"
+                                formControlName="CorporateAccountId">
                             </ng-select>
                         </div>
                         <div class="mb-3">
@@ -80,11 +81,11 @@
                             </div>
 
                             <div class="col">
-                                <label class="col margin-right" *ngFor="let radiobutton of typeOfSchudule">
+                                <label class="col margin-right" *ngFor="let radiobutton of typeOfSchudule;let i = index">
                                     <span class="d-flex align-center">
-                                        <input type="radio" formControlName="scheduleRecurrenceTypeId" (change)="changeSchuduleType(model.option)"
+                                        <input type="radio" id="scheduleRecurrenceTypeId{{i}}" formControlName="scheduleRecurrenceTypeId" (change)="changeSchuduleType(model.option)"
                                             (click)="model.option = radiobutton"
-                                            [checked]="radiobutton === model.option"><span
+                                            [checked]="radiobutton === model.option" value="{{radiobutton}}"><span
                                             class="mx-2">{{radiobutton}}</span>
                                     </span>
                                 </label>
@@ -127,8 +128,8 @@
                                         <ngb-timepicker formControlName="firstStartTime" class="datetimepiker" [meridian]="meridian" />
                                     </div>
                                     <div *ngIf="hourly">
-                                        <label formControlName="lastStartTime" class="fontandweight">Last Start Time</label>
-                                        <ngb-timepicker class="datetimepiker" [meridian]="meridian" />
+                                        <label class="fontandweight">Last Start Time</label>
+                                        <ngb-timepicker formControlName="lastStartTime" class="datetimepiker" [meridian]="meridian" />
                                     </div>
                                     <div class="mb-2">
                                         <label class="fontandweight">Active Duration</label>
@@ -180,6 +181,6 @@
         </div>
     </div>
     <div class="float-end mt-2 w-100">
-        <button type="button" class="btn btn-primary ecolab-col text-right mb-3 mt-2 w-100">Submit</button>
+        <button type="button" class="btn btn-primary ecolab-col text-right mb-3 mt-2 w-100" (click)="submit()">Submit</button>
     </div>
 </form>
