@@ -78,10 +78,47 @@ export class AppService {
           return res.body;
         }),
         catchError((err) => of(new Error(err))),
-        tap((data) =>{ 
+        tap((data) => {
           let checksddl = data?.ConfigureQuestions;
           this.helperService.setDropDownData(checksddl, 'checksddl');
         })
       );
+  }
+
+  getchecklistNames(): Observable<any[]> {
+    let categoryId: number = 9;
+    let corporateIdentifier: string =
+      this.helperService.getUserData()?.CorporateAccountIdentifier;
+    let language: string = 'en-US';
+    return this.httpClient
+      .get(
+        `${this.baseChecklistAPI}/api/TextValueBaseByCategoryByCustomer?categoryId=${categoryId}&corporateAccountIdentifier=${corporateIdentifier}&languageCode=${language}`
+      )
+      .pipe(
+        map((res: any) => {
+          return res.body;
+        }),
+        catchError((err) => of(new Error(err))),
+        tap((checklistNames) => {
+          this.helperService.setDropDownData(checklistNames, 'checklistNames');
+        })
+      );
+  }
+
+  addTextValueRow(reqData: any): Observable<any> {
+    return this.httpClient
+      .post(`${this.baseChecklistAPI}/api/TextValueRow`, reqData)
+      .pipe(
+        map((res: any) => {
+          return res.body;
+        })
+      );
+  }
+
+  submitChecklist(reqData: any): Observable<any> {
+    return this.httpClient.post(`${this.baseChecklistAPI}/api/maintainchecklist`, reqData)
+      .pipe(map((res:any) => {
+        return res.body;
+      }));
   }
 }

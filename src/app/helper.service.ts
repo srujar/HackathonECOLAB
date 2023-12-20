@@ -12,6 +12,7 @@ export class HelperService {
     checklistUserRoles: [],
     checklistAreas: [],
     checksddl: [],
+    checklistNames: [],
   };
 
   userInfo: any = null;
@@ -101,77 +102,33 @@ export class HelperService {
           CanBeAssociateChecklist: false,
           IsRTMChecklist: false,
           ListInternalName: null,
-          ListNameTextId: 291,
-          ListDescriptionTextId: 542,
-
-          ListName: 'Training Checklist',
-          ListDescription:
-            'A pyrometer that is properly calibrated allows you to calibrate equipment and complete internal temperature checks on cooked products. Test the pyrometer each day before you begin any temperature measurements.',
-
+          ListDescriptionTextId: null,
+          ListDescription: '',
           Tags: [],
           ExpiryAlert: [],
           DisplayExpiryAlert: false,
-          Schedules: [
-            {
-              ScheduleRecurrenceTypeId: 1,
-              ScheduleRecurrenceType: 'Hourly',
-              DayRecurrence: 1,
-              HourRecurrence: 1,
-              DayRecurrenceWeekdayFlag: false,
-              WeekRecurrence: null,
-              SundayFlag: false,
-              MondayFlag: false,
-              TuesdayFlag: false,
-              WednesdayFlag: false,
-              ThursdayFlag: false,
-              FridayFlag: false,
-              SaturdayFlag: false,
-              FirstStartTime: '12:00:00',
-              LastStartTime: '12:00:00',
-              TimeDuration: 1,
-              StartDate: '12/17/2023',
-              EndDate: '12/17/2023',
-              MonthRecurrenceType: null,
-              MonthRecurrenceTypeId: null,
-              MonthRecurrenceDay: 10,
-              MonthRecurrence: null,
-              MonthRecurrenceDayOccurrence: 1,
-              NoEndDateFlag: false,
-              MinimumRequiredRecurring: 0,
-              MaximumDailyRecurrence: null,
-              ListKey: null,
-              ListScheduleId: null,
-              LocationIdentifiers: [],
-              IsEdit: false,
-              IsModified: true,
-            },
-          ],
-          ConfigureQuestions: [
-            {
-              QuestionKey: 17,
-              QuestionSort: 0,
-              QuestionText: 'Oven Temperature',
-              QuestionTypeId: 8,
-              AddResponseTextToNameFlag: false,
-              ChildQuestions: [],
-            },
-            {
-              QuestionKey: 19,
-              QuestionSort: 1,
-              QuestionText:
-                'QUALITY CHECK:  Are at least three of the four temperatures above between 155-170F?',
-              QuestionTypeId: 8,
-              MinimumPreferred: null,
-              ObservedQuestions: null,
-              AddResponseTextToNameFlag: false,
-              ListQuestionKey: null,
-              IsRunSizeQuestion: null,
-              ChildQuestions: [],
-            },
-          ],
           EffectiveDate: null,
-          Locations: [],
+          Locations: !this.getHeaderData()?.LocationIdentifier
+            ? []
+            : [
+                {
+                  LocationId: 0,
+                  LocationIdentifier: this.getHeaderData()?.LocationIdentifier,
+                },
+              ],
 
+          // ListKey: 0,
+          Schedules: formData?.scheduleRecurrenceTypeId
+            ? this.createSchedule(formData)
+            : [],
+          ConfigureQuestions: this.createQuestions(formData?.QuestionKey),
+          ListNameTextId: formData?.listNameTextId,
+          ListName: this.getData(
+            formData?.listNameTextId,
+            'checklistNames',
+            'TextValue',
+            'TextId'
+          ),
           ListRoleId: formData?.listRoleId,
           ListRole: this.getData(
             formData?.listRoleId,
@@ -190,7 +147,7 @@ export class HelperService {
             formData?.CorporateAccountId,
             'brands',
             'Brand',
-            'CorporateAccountId',
+            'CorporateAccountId'
           ),
           Areas: this.createArea(formData?.areaIds),
           ListTypeId: formData?.listTypeId,
@@ -204,6 +161,7 @@ export class HelperService {
       ],
     };
     console.log(sampleData);
+    return sampleData;
   }
 
   createArea(data: any) {
@@ -214,7 +172,7 @@ export class HelperService {
           returnData.push({
             Area: eachArea?.CodeValue,
             AreaTextId: eachArea?.CodeId,
-            ListKey: eachArea?.CodeValueName,
+            ListKey: null,
           });
         }
       });
@@ -223,6 +181,9 @@ export class HelperService {
   }
 
   getData(data: any, key: string, key2: string, key3: string) {
+    if (!data || !key || !key2 || !key3) {
+      return '';
+    }
     let returnData = '';
     this.dropDownData[key]?.forEach((eachType: any) => {
       if (data == eachType[key3]) {
@@ -232,4 +193,84 @@ export class HelperService {
     return returnData;
   }
 
+  createQuestions(QuestionKey: any = []) {
+    let returnData = [];
+    QuestionKey?.forEach((id: any) => {
+      this.dropDownData?.checksddl?.forEach((eachQ: any) => {
+        if (id == eachQ?.QuestionKey) {
+          returnData.push({
+            QuestionKey: eachQ?.QuestionKey,
+            QuestionSort: eachQ?.QuestionSort,
+            QuestionText: eachQ?.CheckName,
+            QuestionTypeId: eachQ?.QuestionTypeId,
+            AddResponseTextToNameFlag: false,
+            ChildQuestions: [],
+          });
+        }
+      });
+    });
+  }
+
+  createSchedule(formData: any) {
+    let returnData: any = {
+      DayRecurrenceWeekdayFlag: false,
+      WeekRecurrence: null,
+      SundayFlag: false,
+      MondayFlag: false,
+      TuesdayFlag: false,
+      WednesdayFlag: false,
+      ThursdayFlag: false,
+      FridayFlag: false,
+      SaturdayFlag: false,
+      MonthRecurrenceType: null,
+      MonthRecurrenceTypeId: null,
+      MonthRecurrenceDay: null,
+      MonthRecurrence: null,
+      MonthRecurrenceDayOccurrence: null,
+      NoEndDateFlag: false,
+      MinimumRequiredRecurring: 0,
+      MaximumDailyRecurrence: null,
+      ListKey: null,
+      ListScheduleId: null,
+      LocationIdentifiers: [],
+      IsEdit: false,
+      IsModified: true,
+      ScheduleRecurrenceTypeId: null,
+
+      DayRecurrence: formData?.dayRecurrence,
+      HourRecurrence: formData?.hourRecurrence,
+      FirstStartTime: formData?.firstStartTime
+        ? `${this.n(formData?.firstStartTime?.hour)}:${this.n(
+            formData?.firstStartTime?.minute
+          )}:${this.n(formData?.firstStartTime?.second)}`
+        : null,
+      LastStartTime: formData?.lastStartTime
+        ? `${this.n(formData?.lastStartTime?.hour)}:${this.n(
+            formData?.lastStartTime?.minute
+          )}:${this.n(formData?.lastStartTime?.second)}`
+        : null,
+      TimeDuration: formData?.timeDuration,
+      StartDate: formData?.startDate
+        ? `${formData?.startDate?.month}:${formData?.startDate?.day}:${formData?.startDate?.year}`
+        : null,
+      EndDate: formData?.endDate
+        ? `${formData?.endDate?.month}:${formData?.endDate?.day}:${formData?.endDate?.year}`
+        : null,
+      ScheduleRecurrenceType: formData?.scheduleRecurrenceTypeId,
+    };
+
+    if (formData?.scheduleRecurrenceTypeId == 'No Recurrence') {
+      returnData['ScheduleRecurrenceTypeId'] = 1;
+    } else if (formData?.scheduleRecurrenceTypeId == 'Hourly') {
+      returnData['ScheduleRecurrenceTypeId'] = 2;
+    } else {
+      returnData['ScheduleRecurrenceTypeId'] = 3;
+    }
+
+    return [returnData];
+  }
+
+  n(num: any, len = 2) {
+    return `${num}`.padStart(len, '0');
+  }
 }

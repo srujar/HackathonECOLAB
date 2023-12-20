@@ -20,12 +20,12 @@ export class AppComponent {
   ) {
     this.typeOfSchudule = ['No Recurrence', 'Hourly', 'Daily'];
 
-    activatedRoute.queryParamMap.subscribe(async (params:any) => {
-      if(params.params.hasOwnProperty('token')){
+    activatedRoute.queryParamMap.subscribe(async (params: any) => {
+      if (params.params.hasOwnProperty('token')) {
         this.helperService.setHeaderData(params.params);
         await this.getInitalData();
       }
-    })
+    });
   }
 
   title = 'createChecklistFormMobile';
@@ -49,8 +49,11 @@ export class AppComponent {
   role = [];
   areas = [];
   checksddl = [];
+  checklistNames: any = [];
 
   questionForm!: FormGroup;
+
+  loadData: boolean = false;
 
   async ngOnInit() {
     this.initializeForm();
@@ -62,6 +65,7 @@ export class AppComponent {
         this.role = this.helperService.dropDownData.checklistUserRoles;
         this.areas = this.helperService.dropDownData.checklistAreas;
         this.checksddl = this.helperService.dropDownData.checksddl;
+        this.checklistNames = this.helperService.dropDownData.checklistNames;
       }
     });
   }
@@ -69,6 +73,7 @@ export class AppComponent {
   async getInitalData() {
     await this.appService.getUserInfoDetails().subscribe();
     await this.appService.getBrandList().subscribe();
+    await this.appService.getchecklistNames().subscribe();
   }
 
   onBrandChange(brand: any) {
@@ -110,7 +115,7 @@ export class AppComponent {
   initializeForm() {
     this.changeSchuduleType(this.model);
     this.questionForm = this.fb.group({
-      CorporateAccountId:[{ value: null, disabled: false }, []],
+      CorporateAccountId: [{ value: null, disabled: false }, []],
       listNameTextId: [{ value: null, disabled: false }, []],
       listTypeId: [{ value: null, disabled: false }, []],
       listRoleId: [{ value: null, disabled: false }, []],
@@ -122,6 +127,9 @@ export class AppComponent {
       timeDuration: [{ value: null, disabled: false }, []],
       startDate: [{ value: null, disabled: false }, []],
       endDate: [{ value: null, disabled: false }, []],
+      dayRecurrence: [{ value: null, disabled: false }, []],
+      hourRecurrence: [{ value: null, disabled: false }, []],
+      dayRecurrenceWeekdayFlag: [{ value: null, disabled: false }, []],
     });
   }
 
@@ -142,8 +150,57 @@ export class AppComponent {
     }
   }
 
-  submit(){
+  addDisplayNamePromise = (newText: string) => {
+    return new Promise((resolve, reject) => {
+      this.loadData = true;
+      const reqData = this.getNewTextValueRow(9, newText);
+      this.appService.addTextValueRow(reqData).subscribe(
+        (res: any) => {
+          if (res) {
+            let newData: any = {
+              TextId: res.TextId,
+              TextValue: res.TextValue,
+            };
+            this.checklistNames.push(newData);
+            resolve(newData);
+            this.loadData = false;
+          } else {
+            reject();
+          }
+        },
+        (err: any) => {
+          this.loadData = false;
+          console.log(err);
+          reject();
+        }
+      );
+    });
+  };
+
+  getNewTextValueRow(catId: number, text: string): any {
+    return {
+      TextId: 0,
+      TextCategoryId: catId,
+      LanguageId: 1,
+      TextValue: text,
+      TextValueVersion: 1,
+      ActiveFlag: true,
+      CorporateAccountId: this.selectedBrand?.CorporateAccountId,
+    };
+  }
+
+  submit() {
     console.log(this.questionForm.value);
     let reqData = this.helperService.createJSON(this.questionForm.value);
+    this.appService.submitChecklist(reqData).subscribe(
+      (res) => {
+        console.log('res', res);
+        this.router.navigate(['/success']);
+      },
+      (err) => {
+        this.router.navigate(['/success']);
+        console.log('err on submit checklist', err);
+      }
+    );
   }
 }

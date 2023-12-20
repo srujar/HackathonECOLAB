@@ -20,8 +20,11 @@
                         </div>
                         <div class="mb-3">
                             <label for="" class="form-label">Display Name</label>
-                            <input type="text" formControlName="listNameTextId" class="form-control"
-                                placeholder="Please enter the display name">
+                            <ng-select [readonly]="!this.selectedBrand" [items]="checklistNames"
+                                bindLabel="TextValue" bindValue="TextId" placeholder="Please enter the display name"
+                                formControlName="listNameTextId" [addTag]="addDisplayNamePromise"
+                                addTagText="Add display name" loadingText="'Loading data'" [loading]="loadData">
+                            </ng-select>
                         </div>
                         <div class="mb-3">
                             <label for="" class="form-label">Cheklist Type</label>
@@ -38,8 +41,9 @@
                         </div>
                         <div class="mb-3">
                             <label for="" class="form-label">Area (Multiselect)</label>
-                            <ng-select [readonly]="areas.length == 0" [items]="areas" [multiple]="true" formControlName="areaIds"
-                                bindLabel="CodeValue" bindValue="CodeId" placeholder="Please select the area">
+                            <ng-select [readonly]="areas.length == 0" [items]="areas" [multiple]="true"
+                                formControlName="areaIds" bindLabel="CodeValue" bindValue="CodeId"
+                                placeholder="Please select the area">
                             </ng-select>
                         </div>
                     </div>
@@ -81,9 +85,12 @@
                             </div>
 
                             <div class="col">
-                                <label class="col margin-right" *ngFor="let radiobutton of typeOfSchudule;let i = index">
+                                <label class="col margin-right"
+                                    *ngFor="let radiobutton of typeOfSchudule;let i = index">
                                     <span class="d-flex align-center">
-                                        <input type="radio" id="scheduleRecurrenceTypeId{{i}}" formControlName="scheduleRecurrenceTypeId" (change)="changeSchuduleType(model.option)"
+                                        <input type="radio" id="scheduleRecurrenceTypeId{{i}}"
+                                            formControlName="scheduleRecurrenceTypeId"
+                                            (change)="changeSchuduleType(model.option)"
                                             (click)="model.option = radiobutton"
                                             [checked]="radiobutton === model.option" value="{{radiobutton}}"><span
                                             class="mx-2">{{radiobutton}}</span>
@@ -94,12 +101,12 @@
                                         <div class="d-flex">
                                             <div class="">
                                                 <span class="fontandweight">Every</span>
-                                                <input type="text" class="form-control">
+                                                <input type="text" class="form-control" formControlName="dayRecurrence">
                                                 <span class="fontandweight">day(s)</span>
                                             </div>
                                             <div class="ml-2 ps-4">
                                                 <span class="fontandweight">Every</span>
-                                                <input type="text" class="form-control">
+                                                <input type="text" class="form-control" formControlName="hourRecurrence">
                                                 <span class="fontandweight">hour(s)</span>
                                             </div>
                                         </div>
@@ -108,13 +115,13 @@
                                         <div class="d-flex align-items-center">
                                             <div class="">
                                                 <span class="fontandweight">Every</span>
-                                                <input type="text" class="form-control">
+                                                <input type="text" class="form-control" formControlName="dayRecurrence">
                                                 <span class="fontandweight">day(s)</span>
                                             </div>
                                             <div class="">
                                                 <div class="form-check d-flex align-center ms-1">
                                                     <input class="form-check-input" type="checkbox" value=""
-                                                        id="flexCheckDefault">
+                                                        id="flexCheckDefault" formControlName="dayRecurrenceWeekdayFlag">
                                                     <label class="form-check-label ps-1" for="flexCheckDefault">
                                                         Only Weekdays
                                                     </label>
@@ -125,22 +132,24 @@
 
                                     <div class="mb-2">
                                         <label class="fontandweight">First Start Time</label>
-                                        <ngb-timepicker formControlName="firstStartTime" class="datetimepiker" [meridian]="meridian" />
+                                        <ngb-timepicker formControlName="firstStartTime" class="datetimepiker"
+                                            [meridian]="meridian" />
                                     </div>
                                     <div *ngIf="hourly">
                                         <label class="fontandweight">Last Start Time</label>
-                                        <ngb-timepicker formControlName="lastStartTime" class="datetimepiker" [meridian]="meridian" />
+                                        <ngb-timepicker formControlName="lastStartTime" class="datetimepiker"
+                                            [meridian]="meridian" />
                                     </div>
                                     <div class="mb-2">
                                         <label class="fontandweight">Active Duration</label>
-                                        <input formControlName="timeDuration" type="text" class="form-control inputwidth"
-                                            placeholder="Active Duration">
+                                        <input formControlName="timeDuration" type="text"
+                                            class="form-control inputwidth" placeholder="Active Duration">
                                     </div>
                                     <div class="mb-2">
                                         <label class="fontandweight">Start date</label>
                                         <div class="input-group inputwidth">
-                                            <input formControlName="startDate" class="form-control" placeholder="yyyy-mm-dd" ngbDatepicker
-                                                #startDate="ngbDatepicker" />
+                                            <input formControlName="startDate" class="form-control"
+                                                placeholder="yyyy-mm-dd" ngbDatepicker #startDate="ngbDatepicker" />
                                             <button class="btn btn-outline-secondary bi bi-calendar3"
                                                 (click)="startDate.toggle()" type="button"></button>
                                         </div>
@@ -148,8 +157,8 @@
                                     <div class="mb-2" *ngIf="!noRecurrence">
                                         <label class="fontandweight">EndDate date</label>
                                         <div class="input-group inputwidth">
-                                            <input formControlName="endDate" class="form-control" placeholder="yyyy-mm-dd" ngbDatepicker
-                                                #endDate="ngbDatepicker" />
+                                            <input formControlName="endDate" class="form-control"
+                                                placeholder="yyyy-mm-dd" ngbDatepicker #endDate="ngbDatepicker" />
                                             <button class="btn btn-outline-secondary bi bi-calendar3"
                                                 (click)="endDate.toggle()" type="button"></button>
                                         </div>
@@ -160,7 +169,7 @@
                     </div>
                 </div>
             </div>
-            <div class="accordion-item">
+            <!-- <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed form-label mb-0" type="button" data-bs-toggle="collapse"
                         data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
@@ -176,11 +185,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
         </div>
     </div>
     <div class="float-end mt-2 w-100">
-        <button type="button" class="btn btn-primary ecolab-col text-right mb-3 mt-2 w-100" (click)="submit()">Submit</button>
+        <button type="button" class="btn btn-primary ecolab-col text-right mb-3 mt-2 w-100"
+            (click)="submit()">Submit</button>
     </div>
 </form>
