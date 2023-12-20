@@ -9,12 +9,18 @@ import { HelperService } from './helper.service';
   providedIn: 'root',
 })
 export class AppService {
-  // api path config
+  // qa api path config
   baseOdataAPI: string = 'https://emcaodata-qa.azurewebsites.net';
   baseChecklistAPI: string = 'https://emcachecklists-qa.azurewebsites.net';
   pushNotificationAPIURL: string =
     'https://emcanotifications-qa.azurewebsites.net';
   SecurityAPIURL: string = 'https://emcasecurity-qa.azurewebsites.net';
+
+  // int api path config
+  // baseOdataAPI: string = 'https://emcaodata.azurewebsites.net';
+  // baseChecklistAPI: string = 'https://emcachecklists.azurewebsites.net';
+  // pushNotificationAPIURL: string = 'https://emcanotifications.azurewebsites.net';
+  // SecurityAPIURL: string = 'https://emcasecurity.azurewebsites.net';
 
   constructor(
     private httpClient: BaseHttpClientService,
@@ -116,9 +122,12 @@ export class AppService {
   }
 
   submitChecklist(reqData: any): Observable<any> {
-    return this.httpClient.post(`${this.baseChecklistAPI}/api/maintainchecklist`, reqData)
-      .pipe(map((res:any) => {
-        return res.body;
-      }));
+    return this.httpClient
+      .post(`${this.baseChecklistAPI}/api/maintainchecklist`, reqData)
+      .pipe(
+        map((res: any) => {
+          return res.body;
+        })
+      );
   }
 }

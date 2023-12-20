@@ -12,10 +12,15 @@ import { AppInterceptor } from './app.interceptor';
 import { BaseHttpClientService } from './base-http-client.service';
 import { AppService } from './app.service';
 import { HelperService } from './helper.service';
+import { SuccessComponent } from './success/success.component';
+import { ErrorComponent } from './error/error.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    SuccessComponent,
+    ErrorComponent
   ],
   imports: [
     BrowserModule,
@@ -28,7 +33,8 @@ import { HelperService } from './helper.service';
     NgbDatepickerModule, 
     NgbAlertModule, 
     JsonPipe,
-    HttpClientModule
+    HttpClientModule,
+    NgxSpinnerModule
   ],
   providers: [
     HelperService,

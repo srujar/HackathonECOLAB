@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { HelperService } from './helper.service';
 import { forkJoin } from 'rxjs';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,8 @@ export class AppComponent {
     private appService: AppService,
     private helperService: HelperService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private spinner: NgxSpinnerService
   ) {
     this.typeOfSchudule = ['No Recurrence', 'Hourly', 'Daily'];
 
@@ -71,9 +73,11 @@ export class AppComponent {
   }
 
   async getInitalData() {
+    this.spinner.show();
     await this.appService.getUserInfoDetails().subscribe();
     await this.appService.getBrandList().subscribe();
     await this.appService.getchecklistNames().subscribe();
+    this.spinner.show();
   }
 
   onBrandChange(brand: any) {
@@ -83,6 +87,7 @@ export class AppComponent {
   }
 
   onQuestionChange(question: any) {
+    console.log('question..................', question);
     this.selectedQuestion = question;
   }
 
@@ -91,14 +96,16 @@ export class AppComponent {
     this.getQuestionData();
   }
 
-  getDropDownData() {
-    this.appService
+  async getDropDownData() {
+    this.spinner.show();
+    await this.appService
       .getChecklistDropdownData(
         this.helperService.getUserData()?.Email,
         this.selectedBrand.CorporateAccountIdentifier,
         'en-US'
       )
       .subscribe();
+    this.spinner.hide();
   }
 
   getQuestionData() {
@@ -191,14 +198,17 @@ export class AppComponent {
 
   submit() {
     console.log(this.questionForm.value);
+    this.spinner.show();
     let reqData = this.helperService.createJSON(this.questionForm.value);
     this.appService.submitChecklist(reqData).subscribe(
       (res) => {
         console.log('res', res);
+        alert("Checklist Created!")
+        this.spinner.hide();
         this.router.navigate(['/success']);
       },
       (err) => {
-        this.router.navigate(['/success']);
+        this.router.navigate(['/error']);
         console.log('err on submit checklist', err);
       }
     );
